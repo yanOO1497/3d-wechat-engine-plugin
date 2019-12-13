@@ -1,14 +1,3 @@
-
-
-function setupModuleSystem(settings) {
-    var importMap = { imports: { }, };
-    importMap.imports['cc'] = settings.debug ? 'cocos3d-js.js' : 'cocos3d-js.min.js';
-    const importMapElement = document.createElement('script');
-    importMapElement.type = ccEnv.importMapType;
-    importMapElement.text = JSON.stringify(importMap, undefined, 2);
-    document.body.appendChild(importMapElement);
-}
-
 function loadPrerequisiteModules(settings) {
     const promises = [];
     settings.scripts.forEach(function(script) {
@@ -18,25 +7,6 @@ function loadPrerequisiteModules(settings) {
     });
     return Promise.all(promises);
 }
-
-function loadScriptPackages(settings) {
-    
-        if (settings.scriptPackages) {
-            settings.scriptPackages.forEach((sp) => {
-                require(sp);
-            });
-        }
-        return Promise.resolve(0);
-    
-}
-
-window.importEngine = function() {
-    setupModuleSystem(window._CCSettings);
-    return loadScriptPackages(window._CCSettings).then(function() {
-        return ccEnv.imp("cc");
-    });
-};
-
 window.boot = function () {
     var settings = window._CCSettings;
 
@@ -117,19 +87,10 @@ window.boot = function () {
         cc.view.enableRetina(true);
         cc.view.resizeWithBrowserSize(true);
 		
-        
-        // init assets
-        cc.AssetLibrary.init({
-            libraryPath: 'res/import',
-            rawAssetsBase: 'res/raw-',
-            rawAssets: settings.rawAssets,
-            packedAssets: settings.packedAssets,
-            md5AssetsMap: settings.md5AssetsMap,
-            subpackages: settings.subpackages
-        });
 
-        var launchScene = settings.launchScene;
-        loadPrerequisiteModules(settings).then(function() {
+
+        loadPrerequisiteModules(settings).then(function () {
+            var launchScene = settings.launchScene;
             // load scene
             cc.director.loadScene(launchScene, null,
                 function () {
@@ -142,29 +103,29 @@ window.boot = function () {
                             div.style.backgroundImage = '';
                         }
                     }
-                    
-                    cc.view.setDesignResolutionSize(480, 960, 4);
-        
+
+                    cc.view.setDesignResolutionSize(960, 640, 4);
+
                     cc.loader.onProgress = null;
                     console.log('Success to load scene: ' + launchScene);
                 }
             );
         });
+
     };
+
+    // init assets
+    cc.AssetLibrary.init({
+        libraryPath: 'res/import',
+        rawAssetsBase: 'res/raw-',
+        rawAssets: settings.rawAssets,
+        packedAssets: settings.packedAssets,
+        md5AssetsMap: settings.md5AssetsMap,
+        subpackages: settings.subpackages
+    });
 
     // jsList
     var jsList = settings.jsList;
-	/* <!--  --> */
-	
-		var bundledScript = '';
-        if (jsList) {
-            jsList = jsList.map(function (x) {
-                return 'src/' + x;
-            });
-        } else {
-			jsList = [];
-        }
-	
     var option = {
         id: 'GameCanvas',
         scenes: settings.scenes,
@@ -180,10 +141,3 @@ window.boot = function () {
     cc.game.run(option, onStart);
 };
 
-
-if (window.jsb) {
-    require('src/settings.js');
-    require('src/-jsb.js');
-    require('jsb-adapter/engine/index.js');
-    window.boot();
-}
