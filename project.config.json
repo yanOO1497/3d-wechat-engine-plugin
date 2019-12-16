@@ -23,7 +23,7 @@
 		"bundle": false
 	},
 	"appid": "wx0446ba2621dda60a",
-	"projectname": "CocosCreator3DPlugin",
+	"projectname": "cocosPlugin",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
 	"libVersion": "dev",
