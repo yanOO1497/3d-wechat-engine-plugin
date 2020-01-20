@@ -3,9 +3,12 @@
 	"pluginRoot": "plugin/",
 	"compileType": "gamePlugin",
 	"setting": {
+		"localPlugins": false,
 		"urlCheck": true,
-		"es6": false,
+		"es6": true,
+		"enhance": true,
 		"postcss": false,
+		"preloadBackgroundData": false,
 		"minified": false,
 		"newFeature": true,
 		"coverView": true,

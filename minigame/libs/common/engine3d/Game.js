@@ -65,58 +65,6 @@ Object.assign(game, {
     self._intervalId = window.requestAnimFrame(_callback);
     self._paused = false;
   },
-  _initRenderer: function _initRenderer() {
-    // Avoid setup to be called twice.
-    if (this._rendererInitialized) return;
-    var localCanvas; // frame and container are useless on minigame platform
-
-    this.frame = this.container = document.createElement('div');
-
-    if (__globalAdapter.isSubContext) {
-      localCanvas = window.sharedCanvas || __globalAdapter.getSharedCanvas();
-    } else {
-      localCanvas = window.canvas;
-    }
-
-    this.canvas = localCanvas;
-
-    this._determineRenderType(); // WebGL context created successfully
-
-
-    if (this.renderType === cc.Game.RENDER_TYPE_WEBGL) {
-      var useWebGL2 = !!window.WebGL2RenderingContext; // useWebGL2 = false;
-
-      if (useWebGL2 && cc.WebGL2GFXDevice) {
-        this._gfxDevice = new cc.WebGL2GFXDevice();
-      } else if (cc.WebGLGFXDevice) {
-        this._gfxDevice = new cc.WebGLGFXDevice();
-      }
-
-      var opts = {
-        canvasElm: localCanvas,
-        debug: true,
-        devicePixelRatio: window.devicePixelRatio,
-        nativeWidth: Math.floor(screen.width * cc.view._devicePixelRatio),
-        nativeHeight: Math.floor(screen.height * cc.view._devicePixelRatio)
-      }; // fallback if WebGL2 is actually unavailable (usually due to driver issues)
-
-      if (!this._gfxDevice.initialize(opts) && useWebGL2) {
-        this._gfxDevice = new cc.WebGLGFXDevice();
-
-        this._gfxDevice.initialize(opts);
-      }
-    }
-
-    if (!this._gfxDevice) {
-      // todo fix here for wechat game
-      console.error('can not support canvas rendering in 3D');
-      this.renderType = cc.Game.RENDER_TYPE_CANVAS;
-      return;
-    }
-
-    this._rendererInitialized = true;
-    this.emit(cc.Game.EVENT_RENDERER_INITED);
-  },
   _initEvents: function _initEvents() {
     var win = window;
     var hiddenPropName;
@@ -169,7 +117,7 @@ Object.assign(game, {
       win.addEventListener('focus', onShown);
     }
 
-    if (navigator.userAgent.indexOf('MicroMessenger') > -1) {
+    if (window.navigator.userAgent.indexOf('MicroMessenger') > -1) {
       win.onfocus = onShown;
     }
 
@@ -196,42 +144,8 @@ Object.assign(game, {
       cc.game.resume();
     });
   },
-  end: function end() {},
-  // mini game platform not support this api
-  run: function run(config, onStart) {
-    this._initConfig(config);
+  end: function end() {} // mini game platform not support this api
 
-    this._initRenderer();
-
-    this.onStart = onStart;
-    cc.internal.SplashScreen.instance.main(this._gfxDevice);
-    this.prepare(cc.game.onStart && cc.game.onStart.bind(cc.game));
-  },
-  _prepareFinished: function _prepareFinished(cb) {
-    var _this = this;
-
-    this._prepared = true; // Init engine
-
-    this._initEngine(); // Log engine version
-
-
-    console.log('Cocos Creator 3D v' + cc.ENGINE_VERSION);
-
-    var start = function start() {
-      _this._setAnimFrame();
-
-      _this._runMainLoop();
-
-      _this.emit(cc.Game.EVENT_GAME_INITED);
-
-      if (cb) {
-        cb();
-      }
-    };
-
-    cc.internal.SplashScreen.instance.setOnFinish(start);
-    cc.internal.SplashScreen.instance.loadFinish = true;
-  }
 }); //  Small game in the screen log
 
 function onErrorMessageHandler(info) {
