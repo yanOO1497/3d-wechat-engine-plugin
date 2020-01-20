@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = void 0;
+exports.AudioPlayerWX = void 0;
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -28,23 +28,26 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var AudioPlayer = cc.internal.AudioPlayer;
-var PlayingState = {
-  INITIALIZING: 0,
-  PLAYING: 1,
-  STOPPED: 2
+var _cc$AudioClip = cc.AudioClip,
+    PlayingState = _cc$AudioClip.PlayingState,
+    AudioType = _cc$AudioClip.AudioType;
+
+cc.AudioClip.prototype._getPlayer = function (clip) {
+  this._loadMode = AudioType.JSB_AUDIO;
+  return AudioPlayerWX;
 };
 
-var AudioPlayerMini =
+var AudioPlayerWX =
 /*#__PURE__*/
 function (_AudioPlayer) {
-  _inherits(AudioPlayerMini, _AudioPlayer);
+  _inherits(AudioPlayerWX, _AudioPlayer);
 
-  function AudioPlayerMini(info) {
+  function AudioPlayerWX(info) {
     var _this;
 
-    _classCallCheck(this, AudioPlayerMini);
+    _classCallCheck(this, AudioPlayerWX);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(AudioPlayerMini).call(this, info));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(AudioPlayerWX).call(this, info));
     _this._startTime = 0;
     _this._offset = 0;
     _this._volume = 1;
@@ -79,12 +82,6 @@ function (_AudioPlayer) {
 
       _this._state = PlayingState.STOPPED;
       _this._offset = 0;
-
-      if (_this._oneShoting) {
-        _this._audio.volume = _this._volume;
-        _this._audio.loop = _this._loop;
-        _this._oneShoting = false;
-      }
     });
 
     _this._audio.onEnded(function () {
@@ -96,12 +93,6 @@ function (_AudioPlayer) {
       _this._offset = 0;
 
       _this._eventTarget.emit('ended');
-
-      if (_this._oneShoting) {
-        _this._audio.volume = _this._volume;
-        _this._audio.loop = _this._loop;
-        _this._oneShoting = false;
-      }
     });
 
     _this._audio.onError(function (res) {
@@ -111,7 +102,7 @@ function (_AudioPlayer) {
     return _this;
   }
 
-  _createClass(AudioPlayerMini, [{
+  _createClass(AudioPlayerWX, [{
     key: "play",
     value: function play() {
       if (!this._audio || this._state === PlayingState.PLAYING) {
@@ -121,6 +112,12 @@ function (_AudioPlayer) {
       if (this._blocking) {
         this._interrupted = true;
         return;
+      }
+
+      if (this._oneShoting) {
+        this._audio.volume = this._volume;
+        this._audio.loop = this._loop;
+        this._oneShoting = false;
       }
 
       this._audio.play();
@@ -158,13 +155,14 @@ function (_AudioPlayer) {
 
       this._offset = 0;
       this._oneShoting = true;
-
-      this._audio.stop();
-
       this._audio.loop = false;
-      this._audio.volume = volume;
+      this._audio.volume = volume; // stop and play immediately could run into issues on iOS
 
-      this._audio.play();
+      if (this._state === PlayingState.PLAYING) {
+        this._audio.seek(0);
+      } else {
+        this._audio.play();
+      }
     }
   }, {
     key: "getCurrentTime",
@@ -229,17 +227,11 @@ function (_AudioPlayer) {
         this._audio.destroy();
       }
 
-      __globalAdapter.offAudioInterruptionBegin(this._onHide);
-
-      __globalAdapter.offAudioInterruptionEnd(this._onShow);
-
-      _get(_getPrototypeOf(AudioPlayerMini.prototype), "destroy", this).call(this);
+      _get(_getPrototypeOf(AudioPlayerWX.prototype), "destroy", this).call(this);
     }
   }]);
 
-  return AudioPlayerMini;
+  return AudioPlayerWX;
 }(AudioPlayer);
 
-var _default = AudioPlayerMini;
-exports["default"] = _default;
-module.exports = exports.default;
+exports.AudioPlayerWX = AudioPlayerWX;

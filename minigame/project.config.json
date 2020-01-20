@@ -4,12 +4,13 @@
 		"urlCheck": true,
 		"postcss": true,
 		"minified": true,
-		"newFeature": false
+		"newFeature": false,
+		"enhance": true
 	},
 	"compileType": "game",
 	"libVersion": "game",
-	"appid": "wx0446ba2621dda60a",
-	"projectname": "cocos3d-plugin-demo",
+	"appid": "wx6ac3f5090a6b99c5",
+	"projectname": "wechatgame_plugin",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
 	"condition": {

@@ -53,9 +53,9 @@ function loadImage(item) {
   var image = item.content; // load cc.ImageAsset
 
   var rawUrl = item.rawUrl;
-  var imageAsset = item.imageAsset || new ImageAsset();
+  var imageAsset = item.imageAsset || new cc.ImageAsset();
   imageAsset._uuid = item.uuid;
-  imageAsset.url = rawUrl;
+  imageAsset._url = rawUrl;
 
   imageAsset._setRawAsset(rawUrl, false);
 
@@ -109,25 +109,12 @@ function downloadAudio(item, callback) {
   loadMiniAudio(item, callback);
 }
 
-var AudioPlayerMini = require('./AudioPlayer');
-
 function loadMiniAudio(item, callback) {
   var clip = __globalAdapter.createInnerAudioContext();
 
-  clip.src = item.url;
+  clip.src = item.url; // HACK: wechat does not callback when load large number of audios
 
-  item._owner._getPlayer = function (clip) {
-    var ctor = AudioPlayerMini;
-    this._loadMode = 2;
-    return ctor;
-  };
-
-  clip.onCanplay(function () {
-    return callback(null, clip);
-  });
-  clip.onError(function () {
-    return callback(new Error('load audio failed'));
-  });
+  callback(null, clip);
 }
 
 cc.loader.downloader.addHandlers({

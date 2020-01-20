@@ -12,9 +12,7 @@ if (window.__globalAdapter) {
   utils.cloneMethod(globalAdapter, wx, 'onTouchEnd');
   utils.cloneMethod(globalAdapter, wx, 'onTouchCancel'); // Audio
 
-  utils.cloneMethod(globalAdapter, wx, 'createInnerAudioContext');
-  utils.cloneMethod(globalAdapter, wx, 'offAudioInterruptionBegin');
-  utils.cloneMethod(globalAdapter, wx, 'offAudioInterruptionEnd'); // Video
+  utils.cloneMethod(globalAdapter, wx, 'createInnerAudioContext'); // Video
 
   utils.cloneMethod(globalAdapter, wx, 'createVideo'); // FrameRate
 
