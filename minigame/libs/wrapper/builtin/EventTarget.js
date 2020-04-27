@@ -13,9 +13,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var _events = new WeakMap();
 
-var EventTarget =
-/*#__PURE__*/
-function () {
+var EventTarget = /*#__PURE__*/function () {
   function EventTarget() {
     _classCallCheck(this, EventTarget);
 

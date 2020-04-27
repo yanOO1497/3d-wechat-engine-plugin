@@ -1,20 +1,16 @@
 "use strict";
 
 cc.loader.downloader.loadSubpackage = function (name, completeCallback) {
-  wx.loadSubpackage({
+  __globalAdapter.loadSubpackage({
     name: name,
     success: function success() {
-      Promise.all(packageModuleIds.map(function (id) {
-        return ccEnv.imp(id);
-      })).then(function () {
+      System["import"]('virtual:///prerequisite-imports/' + name).then(function () {
         if (completeCallback) {
           completeCallback();
         }
-      })["catch"](function (error) {
-        console.error(error);
-
+      })["catch"](function (err) {
         if (completeCallback) {
-          completeCallback(new Error("Failed to load subpackage ".concat(name)));
+          completeCallback(err);
         }
       });
     },

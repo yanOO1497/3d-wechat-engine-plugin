@@ -7,6 +7,7 @@ exports["default"] = void 0;
 
 var _index = require("./util/index.js");
 
+// TODO 需要 wx.getSystemInfo 获取更详细信息
 var systemInfo = wx.getSystemInfoSync();
 console.log(systemInfo);
 var system = systemInfo.system;

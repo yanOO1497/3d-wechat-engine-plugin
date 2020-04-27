@@ -14,9 +14,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 /*
  * TODO 使用 wx.readFile 来封装 FileReader
  */
-var FileReader =
-/*#__PURE__*/
-function () {
+var FileReader = /*#__PURE__*/function () {
   function FileReader() {
     _classCallCheck(this, FileReader);
   }

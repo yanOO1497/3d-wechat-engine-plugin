@@ -3,7 +3,7 @@
 	"pluginRoot": "plugin/",
 	"compileType": "gamePlugin",
 	"setting": {
-		"localPlugins": false,
+		"localPlugins": true,
 		"urlCheck": true,
 		"es6": true,
 		"enhance": true,
@@ -23,7 +23,9 @@
 			"disablePlugins": [],
 			"outputPath": ""
 		},
-		"bundle": false
+		"bundle": false,
+		"useCompilerModule": true,
+		"userConfirmedUseCompilerModuleSwitch": false
 	},
 	"appid": "wx0446ba2621dda60a",
 	"projectname": "cocosPlugin",

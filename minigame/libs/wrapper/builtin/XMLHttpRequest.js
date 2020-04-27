@@ -9,7 +9,7 @@ var _EventTarget2 = _interopRequireDefault(require("./EventTarget.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -53,9 +53,7 @@ function _changeReadyState(readyState) {
   _triggerEvent.call(this, 'readystatechange');
 }
 
-var XMLHttpRequest =
-/*#__PURE__*/
-function (_EventTarget) {
+var XMLHttpRequest = /*#__PURE__*/function (_EventTarget) {
   _inherits(XMLHttpRequest, _EventTarget);
 
   // TODO 没法模拟 HEADERS_RECEIVED 和 LOADING 两个状态

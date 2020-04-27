@@ -13,9 +13,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var _socketTask = new WeakMap();
 
-var WebSocket =
-/*#__PURE__*/
-function () {
+var WebSocket = /*#__PURE__*/function () {
   // The connection is not yet open.
   // The connection is open and ready to communicate.
   // The connection is in the process of closing.

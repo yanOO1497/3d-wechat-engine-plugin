@@ -1,6 +1,6 @@
 "use strict";
 
-var mgr = cc && cc.internal.inputManager;
+var mgr = cc.internal.inputManager;
 var canvasPosition = {
   left: 0,
   top: 0,
