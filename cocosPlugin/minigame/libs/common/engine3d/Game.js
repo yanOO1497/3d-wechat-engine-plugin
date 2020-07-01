@@ -11,28 +11,11 @@ Object.assign(game, {
     if (__globalAdapter.setPreferredFramesPerSecond) {
       __globalAdapter.setPreferredFramesPerSecond(frameRate);
     } else {
-      if (this._intervalId) {
-        window.cancelAnimFrame(this._intervalId);
-      }
-
-      this._intervalId = 0;
       this._paused = true;
 
       this._setAnimFrame();
 
       this._runMainLoop();
-    }
-  },
-  _setAnimFrame: function _setAnimFrame() {
-    this._lastTime = performance.now();
-    this._frameTime = 1000 / _frameRate;
-
-    if (_frameRate !== 60 && _frameRate !== 30) {
-      window.requestAnimFrame = this._stTime;
-      window.cancelAnimFrame = this._ctTime;
-    } else {
-      window.requestAnimFrame = window.requestAnimationFrame || this._stTime;
-      window.cancelAnimFrame = window.cancelAnimationFrame || this._ctTime;
     }
   },
   getFrameRate: function getFrameRate() {
@@ -47,10 +30,11 @@ Object.assign(game, {
         frameRate = config.frameRate;
 
     cc.debug.setDisplayStats(config.showFPS);
+    director.startAnimation();
 
-    _callback = function callback() {
+    _callback = function callback(time) {
       if (!self._paused) {
-        self._intervalId = window.requestAnimFrame(_callback);
+        self._intervalId = window.rAF(_callback);
 
         if (_frameRate === 30 && !__globalAdapter.setPreferredFramesPerSecond) {
           if (skip = !skip) {
@@ -58,11 +42,16 @@ Object.assign(game, {
           }
         }
 
-        director.mainLoop();
+        director.mainLoop(time);
       }
     };
 
-    self._intervalId = window.requestAnimFrame(_callback);
+    if (self._intervalId) {
+      window.cAF(self._intervalId);
+      self._intervalId = 0;
+    }
+
+    self._intervalId = window.rAF(_callback);
     self._paused = false;
   },
   _initEvents: function _initEvents() {

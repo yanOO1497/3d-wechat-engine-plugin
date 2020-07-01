@@ -172,6 +172,7 @@ var AudioPlayerWX = /*#__PURE__*/function (_AudioPlayer) {
       var current = (performance.now() - this._startTime + this._offset) / 1000;
 
       if (current > this._duration) {
+        if (!this._loop) return 0;
         current -= this._duration;
         this._startTime += this._duration * 1000;
       }
