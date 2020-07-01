@@ -1,6 +1,5 @@
 {
 	"description": "项目配置文件。",
-	"pluginRoot": "cocos",
 	"setting": {
 		"localPlugins": true,
 		"urlCheck": true,
@@ -26,7 +25,7 @@
 	},
 	"compileType": "game",
 	"libVersion": "game",
-	"appid": "wx6ac3f5090a6b99c5",
+	"appid": "wx0446ba2621dda60a",
 	"projectname": "CocosCreator3D",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},

@@ -8,13 +8,10 @@
 		"es6": true,
 		"enhance": true,
 		"postcss": false,
-		"preloadBackgroundData": false,
 		"minified": false,
 		"newFeature": true,
 		"coverView": true,
 		"autoAudits": false,
-		"showShadowRootInWxmlPanel": false,
-		"scopeDataCheck": false,
 		"checkInvalidKey": true,
 		"checkSiteMap": true,
 		"uploadWithSourceMap": true,
@@ -24,6 +21,9 @@
 			"outputPath": ""
 		},
 		"bundle": false,
+		"preloadBackgroundData": false,
+		"showShadowRootInWxmlPanel": false,
+		"scopeDataCheck": false,
 		"useCompilerModule": true,
 		"userConfirmedUseCompilerModuleSwitch": false
 	},
@@ -31,6 +31,6 @@
 	"projectname": "cocosPlugin",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
-	"libVersion": "dev",
+	"libVersion": "2.11.0",
 	"condition": {}
 }
