@@ -1,6 +1,5 @@
-exports.configs = [
-    {
-        platform: 'wechatgame',
-        hooks: './hooks',
-    },
-];
+exports.configs = {
+    wechatgame: {
+        hooks: './hooks.js'
+    }
+};

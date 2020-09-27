@@ -1,5 +1,5 @@
-import { removeSync, moveSync, writeJSONSync } from 'fs-extra';
-import { join, basename } from 'path';
+import { moveSync, writeJSONSync } from 'fs-extra';
+import { join } from 'path';
 
 export function onBeforeComplete(options, result) {
     if (!options.separateEngine) {
@@ -14,7 +14,5 @@ export function onBeforeComplete(options, result) {
     };
     writeJSONSync(gameJsonPath, gameJson);
     // 将打包出来的引擎移动到 plugin 内部
-    moveSync(result.paths.engine, join(__dirname, '../../cocosPlugin/plugin', basename(result.paths.engine)));
-    // 删除打出包的 cocos 文件夹
-    removeSync(join(result.paths.dir, 'cocos'));
+    moveSync(result.paths.engine, join(__dirname, '../../cocosPlugin/plugin'));
 }

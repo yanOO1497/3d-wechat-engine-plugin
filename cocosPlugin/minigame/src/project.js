@@ -1,3 +1,4 @@
+System.register([], function(_export, _context) { return { execute: function () {
 System.register("chunks:///_virtual/prerequisite-imports:main",[],(function(e,t){return{setters:[],execute:function(){}}}));
 
 (function(r) {
@@ -11,3 +12,4 @@ System.register("chunks:///_virtual/prerequisite-imports:main",[],(function(e,t)
     };
     });
 });
+} }; });

@@ -55,19 +55,6 @@ Object.assign(game, {
     self._paused = false;
   },
   _initEvents: function _initEvents() {
-    var win = window;
-    var hiddenPropName;
-
-    if (typeof document.hidden !== 'undefined') {
-      hiddenPropName = 'hidden';
-    } else if (typeof document.mozHidden !== 'undefined') {
-      hiddenPropName = 'mozHidden';
-    } else if (typeof document.msHidden !== 'undefined') {
-      hiddenPropName = 'msHidden';
-    } else if (typeof document.webkitHidden !== 'undefined') {
-      hiddenPropName = 'webkitHidden';
-    }
-
     var hidden = false;
 
     function onHidden() {
@@ -84,48 +71,10 @@ Object.assign(game, {
       }
     }
 
-    if (hiddenPropName) {
-      var changeList = ['visibilitychange', 'mozvisibilitychange', 'msvisibilitychange', 'webkitvisibilitychange', 'qbrowserVisibilityChange'];
-
-      for (var i = 0; i < changeList.length; i++) {
-        document.addEventListener(changeList[i], function (event) {
-          var visible = document[hiddenPropName]; // QQ App
-          // @ts-ignore
-
-          visible = visible || event.hidden;
-
-          if (visible) {
-            onHidden();
-          } else {
-            onShown();
-          }
-        });
-      }
-    } else {
-      win.addEventListener('blur', onHidden);
-      win.addEventListener('focus', onShown);
-    }
-
-    if (window.navigator.userAgent.indexOf('MicroMessenger') > -1) {
-      win.onfocus = onShown;
-    }
-
-    if (__globalAdapter.onShow) {
-      __globalAdapter.onShow(onShown);
-    }
-
-    if (__globalAdapter.onHide) {
-      __globalAdapter.onHide(onHidden);
-    }
-
-    if ('onpageshow' in window && 'onpagehide' in window) {
-      win.addEventListener('pagehide', onHidden);
-      win.addEventListener('pageshow', onShown); // Taobao UIWebKit
-
-      document.addEventListener('pagehide', onHidden);
-      document.addEventListener('pageshow', onShown);
-    }
-
+    __globalAdapter.onAudioInterruptionEnd && __globalAdapter.onAudioInterruptionEnd(onShown);
+    __globalAdapter.onAudioInterruptionBegin && __globalAdapter.onAudioInterruptionBegin(onHidden);
+    __globalAdapter.onShow && __globalAdapter.onShow(onShown);
+    __globalAdapter.onHide && __globalAdapter.onHide(onHidden);
     this.on(cc.Game.EVENT_HIDE, function () {
       cc.game.pause();
     });

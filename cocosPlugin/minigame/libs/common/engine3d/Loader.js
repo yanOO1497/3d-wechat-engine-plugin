@@ -4,6 +4,7 @@ cc.loader.downloader.loadSubpackage = function (name, completeCallback) {
   __globalAdapter.loadSubpackage({
     name: name,
     success: function success() {
+      var System = typeof window === 'undefined' ? System : window.System;
       System["import"]('virtual:///prerequisite-imports/' + name).then(function () {
         if (completeCallback) {
           completeCallback();

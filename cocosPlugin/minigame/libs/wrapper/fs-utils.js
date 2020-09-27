@@ -143,6 +143,11 @@ function writeFileSync(path, data, encoding) {
 function readFile(filePath, encoding, callback) {
   var result = checkFsValid();
   if (result) return result;
+
+  if (filePath.indexOf('./') === 0) {
+    filePath = filePath.replace('./', '');
+  }
+
   fs.readFile({
     filePath: filePath,
     encoding: encoding,

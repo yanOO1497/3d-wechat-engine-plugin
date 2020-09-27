@@ -5,6 +5,12 @@ var utils = require('./utils');
 if (window.__globalAdapter) {
   var globalAdapter = window.__globalAdapter; // SystemInfo
 
+  var systemInfo = wx.getSystemInfoSync();
+  var windowWidth = systemInfo.windowWidth;
+  var windowHeight = systemInfo.windowHeight;
+  var isLandscape = windowWidth > windowHeight;
+  globalAdapter.isSubContext = wx.getOpenDataContext === undefined;
+  globalAdapter.isDevTool = systemInfo.platform === 'devtools';
   utils.cloneMethod(globalAdapter, wx, 'getSystemInfoSync'); // TouchEvent
 
   utils.cloneMethod(globalAdapter, wx, 'onTouchStart');
@@ -12,7 +18,10 @@ if (window.__globalAdapter) {
   utils.cloneMethod(globalAdapter, wx, 'onTouchEnd');
   utils.cloneMethod(globalAdapter, wx, 'onTouchCancel'); // Audio
 
-  utils.cloneMethod(globalAdapter, wx, 'createInnerAudioContext'); // Video
+  utils.cloneMethod(globalAdapter, wx, 'createInnerAudioContext'); // AudioInterruption Evnet
+
+  utils.cloneMethod(globalAdapter, wx, 'onAudioInterruptionEnd');
+  utils.cloneMethod(globalAdapter, wx, 'onAudioInterruptionBegin'); // Video
 
   utils.cloneMethod(globalAdapter, wx, 'createVideo'); // FrameRate
 
@@ -29,8 +38,7 @@ if (window.__globalAdapter) {
   utils.cloneMethod(globalAdapter, wx, 'offKeyboardComplete'); // Message
 
   utils.cloneMethod(globalAdapter, wx, 'getOpenDataContext');
-  utils.cloneMethod(globalAdapter, wx, 'onMessage');
-  globalAdapter.isSubContext = globalAdapter.getOpenDataContext === undefined; // Subpackage
+  utils.cloneMethod(globalAdapter, wx, 'onMessage'); // Subpackage
 
   utils.cloneMethod(globalAdapter, wx, 'loadSubpackage'); // SharedCanvas
 
@@ -47,10 +55,6 @@ if (window.__globalAdapter) {
 
   var isAccelerometerInit = false;
   var deviceOrientation = 1;
-  var systemInfo = wx.getSystemInfoSync();
-  var windowWidth = systemInfo.windowWidth;
-  var windowHeight = systemInfo.windowHeight;
-  var isLandscape = windowWidth > windowHeight;
 
   if (wx.onDeviceOrientationChange) {
     wx.onDeviceOrientationChange(function (res) {
