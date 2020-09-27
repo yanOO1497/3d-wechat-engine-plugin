@@ -1,1 +1,20 @@
-{"provider":"wx0446ba2621dda60a","signature":[{"md5":"2da69580c80386187a0464abf6ce45c6","path":"cc.base.js"},{"md5":"384718c081d1a8dac985d3603eb90324","path":"deprecated-d2827829.js"},{"md5":"fd61ab24847a44885e1551c0b5488fdc","path":"deprecated-339a6fe8.js"},{"md5":"c69073eec58d36fe247127c049b411f9","path":"index-366e8146.js"},{"md5":"c44154f682f38ed872e3cde86a82ea0f","path":"SubContextView-2fc592af.js"},{"md5":"e4b61bf4d615abc473dbcbf5a3d744a6","path":"component-event-handler-c4d221bc.js"},{"md5":"4408087c80f762b75a59d2f91ae92eea","path":"fence-0030b122.js"},{"md5":"d59fdcc6bda8358db2bc5e838f70cfe5","path":"html-text-parser-c4b91c1e.js"},{"md5":"787ced08bc8cbd36873a6423548b9762","path":"cc.gfx-webgl.js"},{"md5":"1570981689b611263ba914e761752a99","path":"webgl-define-340ff48d.js"},{"md5":"28ff8d5dbb21053c0a7c3c1612fee63f","path":"cc.ui.js"},{"md5":"f04883ace9c56bd0f83af967c8a7d906","path":"cc.particle.js"},{"md5":"a08d3fa23372aba9fb043da949d92d72","path":"cc.physics-cannon.js"},{"md5":"1491df64af00d0a2868a5293a0d8550e","path":"_commonjsHelpers-d6df3c9f.js"},{"md5":"75c7b338632cad0c845d3a5d91f8eb37","path":"index-3b2adf0f.js"},{"md5":"1acd8741c157bf8a2ffe072ce355d8d8","path":"terrain-asset-a83bdc82.js"},{"md5":"34f725c1c1bd3a5f33426f35871b5a91","path":"util-2b6369c6.js"},{"md5":"a23b159a5cbf9e3bffc483199056f88e","path":"cc.physics-framework.js"},{"md5":"ae30e898eb26f8aa2c0dff85a633734e","path":"cc.audio.js"},{"md5":"5350f35e0b63a91c3b8eb19345e4f4ba","path":"cc.tween.js"},{"md5":"91d61fbe08940576f651a4d25f39e851","path":"cc.terrain.js"},{"md5":"d6c24c22ef73cb85a58c5c9c94bbed5a","path":"cc.js"}]}
+{
+    "provider": "wx0446ba2621dda60a",
+    "signature": [
+        { "md5": "6418e8ec562021460bed4ee8ea4ee51f", "path": "index.js" },
+        { "path": "index.js", "md5": "6418e8ec562021460bed4ee8ea4ee51f" },
+        { "md5": "55e365f3887b92d7ea2d5c7da374ec90", "path": "cc.audio.js" },
+        { "md5": "4f3690a42b560c6bd080d099f7a11388", "path": "cc.base.js" },
+        { "md5": "d8ec7266cd0a7730478476b4fddfee43", "path": "cc.gfx-webgl.js" },
+        { "md5": "b1f666d15abfae1b182919e205353fb0", "path": "cc.gfx-webgl2.js" },
+        { "md5": "d426f9eb6c207bd3a074657132b24494", "path": "cc.particle.js" },
+        { "md5": "79da02ac2433f3fe653c4e17b56700e6", "path": "cc.physics-ammo.js" },
+        { "md5": "fc930b281a7df11ddd2b6fe6fe99878d", "path": "cc.physics-builtin.js" },
+        { "md5": "cbd79b50bff90f9df0e84216f7197bec", "path": "cc.physics-cannon.js" },
+        { "md5": "eb4cae2bec5a77b4f3df094785d5e610", "path": "cc.physics-framework.js" },
+        { "md5": "37e46972fa71870faef07c153b571c6d", "path": "cc.terrain.js" },
+        { "md5": "f1e2133de998a18492adc745506767fb", "path": "cc.tween.js" },
+        { "md5": "dcdfcf8109836e48ae1e7051a9a07e82", "path": "cc.ui.js" },
+        { "md5": "19cb78f59269e1ff27805c4fe78f6ebe", "path": "cc.wait-for-ammo-instantiation.js" }
+    ]
+}
