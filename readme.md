@@ -2,7 +2,15 @@
 
 自 1.2 起，实际需要上传的引擎插件放置在编辑器打包路径的 resources 文件夹下的 3d/engine/bin/.cache/editor-cache/wechatgame 目录下。
 
-## 环境配置
+## 下载项目包
+
+![](./images/download.png)
+
+https://github.com/cocos-creator/3d-wechat-engine-plugin
+
+直接使用 git 拉取项目或者下载 zip 包即可。
+
+## 插件包生成步骤
 
 手动拷贝方式：
 
