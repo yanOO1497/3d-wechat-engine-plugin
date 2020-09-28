@@ -29,7 +29,16 @@ https://github.com/cocos-creator/3d-wechat-engine-plugin
 
 1. **需要保证在编辑器内打开项目，以及预览都可以正常显示**
 2. 在编辑器内打开当前项目，只勾选引擎分离选项，构建微信包。
-3. 将构建成功的微信包除了 `cocos` 文件夹，复制到 `cocosPlugin/minigame` 文件夹内，并将项目内的 `game.json` 里的 `cocos` 的 version 改为 **dev**。
+3. 将构建成功的微信包除了 `cocos` 文件夹，复制到 `cocosPlugin/minigame` 文件夹内，并将项目内的 `game.json` 里的 `plugins` 字段改成下图所示。
+
+```
+  "plugins": {
+    "cocos": {
+      "version": "dev",
+      "provider": "wx0446ba2621dda60a"
+    }
+  }
+```
 
 4. 一共需要构建拷贝 3 次，分别是不同物理引擎模块的选项；
 
