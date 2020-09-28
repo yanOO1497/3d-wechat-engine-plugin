@@ -14,9 +14,7 @@ https://github.com/cocos-creator/3d-wechat-engine-plugin
 
 手动拷贝方式：
 
-1. 将 `3d/engine/bin/.cache/editor-cache/wechatgame/cocos` 路径下的文件夹，直接复制到 `cocosPlugin/plugin` 目录下。
-2. 在编辑器内打开当前项目，勾选引擎分离选项，构建微信包。
-3. 将构建成功的微信包除了 `cocos` 文件夹，复制到 `cocosPlugin/minigame` 文件夹内，并将项目内的 `game.json` 里的 `cocos` 的 version 改为 **dev**。
+清空`cocosPlugin/plugin` 目录，将 `3d/engine/bin/.cache/editor-cache/wechatgame/cocos` 路径下的所有文件，直接复制到 `cocosPlugin/plugin` 目录下。
 
 自动拷贝方式：
 
@@ -29,7 +27,11 @@ https://github.com/cocos-creator/3d-wechat-engine-plugin
 使用微信开发者工具，用带有引擎插件开发权限的微信号登录后，打开 `cocosPlugin` 目录，并且确认是在**小游戏插件模式**下的即可。
 ![](./images/wechat_dev_tools.png)
 
-**需要保证在编辑器内打开项目，以及预览都可以正常显示**
+1. **需要保证在编辑器内打开项目，以及预览都可以正常显示**
+2. 在编辑器内打开当前项目，只勾选引擎分离选项，构建微信包。
+3. 将构建成功的微信包除了 `cocos` 文件夹，复制到 `cocosPlugin/minigame` 文件夹内，并将项目内的 `game.json` 里的 `cocos` 的 version 改为 **dev**。
+
+4. 一共需要构建拷贝 3 次，分别是不同物理引擎模块的选项；
 
 ## 上传发布阶段
 
