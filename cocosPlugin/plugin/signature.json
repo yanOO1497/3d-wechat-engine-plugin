@@ -4,7 +4,6 @@
         { "md5": "6418e8ec562021460bed4ee8ea4ee51f", "path": "index.js" },
         { "path": "index.js", "md5": "6418e8ec562021460bed4ee8ea4ee51f" },
         { "md5": "55e365f3887b92d7ea2d5c7da374ec90", "path": "cc.audio.js" },
-        { "md5": "4f3690a42b560c6bd080d099f7a11388", "path": "cc.base.js" },
         { "md5": "d8ec7266cd0a7730478476b4fddfee43", "path": "cc.gfx-webgl.js" },
         { "md5": "b1f666d15abfae1b182919e205353fb0", "path": "cc.gfx-webgl2.js" },
         { "md5": "d426f9eb6c207bd3a074657132b24494", "path": "cc.particle.js" },

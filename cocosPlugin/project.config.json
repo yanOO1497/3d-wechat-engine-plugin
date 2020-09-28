@@ -1,7 +1,7 @@
 {
 	"miniprogramRoot": "minigame/",
 	"pluginRoot": "plugin/",
-	"compileType": "game",
+	"compileType": "gamePlugin",
 	"setting": {
 		"localPlugins": true,
 		"urlCheck": true,
