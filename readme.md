@@ -1,6 +1,6 @@
 # 微信引擎插件发布流程
 
-自 1.2 起，实际需要上传的引擎插件放置在编辑器打包路径的 resources 文件夹下的 3d/engine/bin/.cache/editor-cache/wechatgame 目录下。
+自 1.2 起，实际需要上传的引擎插件放置在编辑器打包路径的 resources 文件夹下的 3d/engine/bin/.cache/editor-cache/wechat-game/cocos 目录下。
 
 ## 下载项目包
 
@@ -12,11 +12,11 @@ https://github.com/cocos-creator/3d-wechat-engine-plugin
 
 ## 插件包生成步骤
 
-手动拷贝方式：
+### 手动拷贝方式
 
-清空`cocosPlugin/plugin` 目录，将 `3d/engine/bin/.cache/editor-cache/wechatgame/cocos` 路径下的所有文件，直接复制到 `cocosPlugin/plugin` 目录下。
+清空`cocosPlugin/plugin` 目录，将 `3d/engine/bin/.cache/editor-cache/wechat-game/cocos` 路径下的所有文件，直接复制到 `cocosPlugin/plugin` 目录下。(仅需拷贝一次)
 
-自动拷贝方式：
+### 自动拷贝方式
 
 当前项目内放置了一个微信构建插件，在构建配置面板点击启用后直接构建就会生成对应的插件包。
 
@@ -40,7 +40,7 @@ https://github.com/cocos-creator/3d-wechat-engine-plugin
   }
 ```
 
-4. 一共需要构建拷贝 3 次，分别是不同物理引擎模块的选项；
+4. 一共需要构建 3 次，分别是不同物理引擎模块的选项；
 
 ## 上传发布阶段
 
