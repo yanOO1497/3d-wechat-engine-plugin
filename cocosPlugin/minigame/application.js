@@ -29,27 +29,14 @@ function createApplication(_ref) {
 
 
   var promise = Promise.resolve();
-  promise = promise.then(function () {
-    return topLevelImport('cc.wait-for-ammo-instantiation');
-  }).then(function (_ref2) {
-    var waitForAmmoInstantiation = _ref2["default"];
-
-    if (!waitForAmmoInstantiation.isWasm) {
-      return waitForAmmoInstantiation();
-    } else {
-      return Promise.resolve(loadAmmoJsWasmBinary()).then(function (wasmBinary) {
-        return waitForAmmoInstantiation(wasmBinary);
-      });
-    }
-  });
   return promise.then(function () {
     return _defineProperty({
       start: start
     }, 'import', topLevelImport);
   });
 
-  function start(_ref4) {
-    var findCanvas = _ref4.findCanvas;
+  function start(_ref3) {
+    var findCanvas = _ref3.findCanvas;
     var settings;
     var cc;
     return Promise.resolve().then(function () {
@@ -97,7 +84,7 @@ function createApplication(_ref) {
 
   function loadSettingsJson(cc) {
     return new Promise(function (resolve, reject) {
-      cc.loader.load('./res/settings.307ce.json', function (err, json) {
+      cc.loader.load('./res/settings.724a5.json', function (err, json) {
         if (err) {
           return reject(err);
         }
@@ -219,11 +206,11 @@ function getGameOptions(settings, findCanvas) {
   return options;
 }
 
-function initializeModuleLoader(System, _ref5) {
-  var importMap = _ref5.importMap,
-      importMapBaseUrl = _ref5.importMapBaseUrl,
-      execMap = _ref5.execMap,
-      execNoSchema = _ref5.execNoSchema;
+function initializeModuleLoader(System, _ref4) {
+  var importMap = _ref4.importMap,
+      importMapBaseUrl = _ref4.importMapBaseUrl,
+      execMap = _ref4.execMap,
+      execNoSchema = _ref4.execNoSchema;
   var noSchemaPlaceholder = 'no-schema:';
   var systemJsPrototype = System.constructor.prototype;
   var baseUrlSchema = importMapBaseUrl || noSchemaPlaceholder;
