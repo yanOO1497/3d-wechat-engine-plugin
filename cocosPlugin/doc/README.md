@@ -10,8 +10,6 @@
 
 ![构建面板选项](./image/build-options.jpg)
 
-> 由于 Cocos Creator 版本史比较短，并且最早之前的引擎版本是没有办法当做插件直接 require 的，因而 Cocos Creator 3.0.0 之前的版本不支持微信引擎分离这边也不提供相关处理方式，如果有需要此功能的用户，还请升级到 3.0.0 以上版本以获得最佳的使用体验。
-
 ## Q&A
 
 Q：微信小游戏开放数据域支持该功能吗？<br/>
@@ -36,4 +34,5 @@ Q：启用引擎插件后，在微信开发工具中提示 “插件未授权使
 A：如果出现插件未授权使用，需要点击添加插件，选择 `CocosCreator3D` 插件后关闭即可。
 
 ## 参考链接
+
 - 更多技术细节，请参考 [微信小游戏引擎插件官方说明](https://developers.weixin.qq.com/minigame/dev/guide/base-ability/game-engine-plugin.html)

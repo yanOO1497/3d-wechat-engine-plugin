@@ -3,7 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.AudioPlayerWX = void 0;
+exports.AudioPlayerMiniGame = void 0;
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -17,10 +21,6 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
@@ -31,29 +31,102 @@ var AudioPlayer = cc.internal.AudioPlayer;
 var _cc$AudioClip = cc.AudioClip,
     PlayingState = _cc$AudioClip.PlayingState,
     AudioType = _cc$AudioClip.AudioType;
+var AudioManager = cc.internal.AudioManager;
+AudioManager.maxAudioChannel = 10;
+
+function loadInnerAudioContext(url) {
+  return new Promise(function (resolve, reject) {
+    var nativeAudio = __globalAdapter.createInnerAudioContext();
+
+    var timer = setTimeout(function () {
+      clearEvent();
+      resolve(nativeAudio);
+    }, 8000);
+
+    function clearEvent() {
+      nativeAudio.offCanplay(success);
+      nativeAudio.offError(fail);
+    }
+
+    function success() {
+      clearEvent();
+      clearTimeout(timer);
+      resolve(nativeAudio);
+    }
+
+    function fail() {
+      clearEvent();
+      clearTimeout(timer);
+      reject('failed to load innerAudioContext: ' + err);
+    }
+
+    nativeAudio.onCanplay(success);
+    nativeAudio.onError(fail);
+    nativeAudio.src = url;
+  });
+}
+
+var AudioManagerMiniGame = /*#__PURE__*/function (_AudioManager) {
+  _inherits(AudioManagerMiniGame, _AudioManager);
+
+  function AudioManagerMiniGame() {
+    _classCallCheck(this, AudioManagerMiniGame);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(AudioManagerMiniGame).apply(this, arguments));
+  }
+
+  _createClass(AudioManagerMiniGame, [{
+    key: "discardOnePlayingIfNeeded",
+    value: function discardOnePlayingIfNeeded() {
+      if (this._playingAudios.length < AudioManager.maxAudioChannel) {
+        return;
+      } // a played audio has a higher priority than a played shot
+
+
+      var audioToDiscard;
+
+      var oldestOneShotIndex = this._playingAudios.findIndex(function (audio) {
+        return !(audio instanceof AudioPlayerMiniGame);
+      });
+
+      if (oldestOneShotIndex > -1) {
+        audioToDiscard = this._playingAudios[oldestOneShotIndex];
+
+        this._playingAudios.splice(oldestOneShotIndex, 1);
+      } else {
+        audioToDiscard = this._playingAudios.shift();
+      }
+
+      if (audioToDiscard) {
+        audioToDiscard.stop();
+      }
+    }
+  }]);
+
+  return AudioManagerMiniGame;
+}(AudioManager);
 
 cc.AudioClip.prototype._getPlayer = function (clip) {
   this._loadMode = AudioType.JSB_AUDIO;
-  return AudioPlayerWX;
+  return AudioPlayerMiniGame;
 };
 
-var AudioPlayerWX = /*#__PURE__*/function (_AudioPlayer) {
-  _inherits(AudioPlayerWX, _AudioPlayer);
+var AudioPlayerMiniGame = /*#__PURE__*/function (_AudioPlayer) {
+  _inherits(AudioPlayerMiniGame, _AudioPlayer);
 
-  function AudioPlayerWX(info) {
+  function AudioPlayerMiniGame(info) {
     var _this;
 
-    _classCallCheck(this, AudioPlayerWX);
+    _classCallCheck(this, AudioPlayerMiniGame);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(AudioPlayerWX).call(this, info));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(AudioPlayerMiniGame).call(this, info));
     _this._startTime = 0;
     _this._offset = 0;
     _this._volume = 1;
     _this._loop = false;
-    _this._oneShoting = false;
-    _this._audio = info.clip;
+    _this._nativeAudio = info.nativeAudio;
 
-    _this._audio.onPlay(function () {
+    _this._nativeAudio.onPlay(function () {
       if (_this._state === PlayingState.PLAYING) {
         return;
       }
@@ -61,10 +134,10 @@ var AudioPlayerWX = /*#__PURE__*/function (_AudioPlayer) {
       _this._state = PlayingState.PLAYING;
       _this._startTime = performance.now();
 
-      _this._eventTarget.emit('started');
+      _this._clip.emit('started');
     });
 
-    _this._audio.onPause(function () {
+    _this._nativeAudio.onPause(function () {
       if (_this._state === PlayingState.STOPPED) {
         return;
       }
@@ -73,7 +146,7 @@ var AudioPlayerWX = /*#__PURE__*/function (_AudioPlayer) {
       _this._offset += performance.now() - _this._startTime;
     });
 
-    _this._audio.onStop(function () {
+    _this._nativeAudio.onStop(function () {
       if (_this._state === PlayingState.STOPPED) {
         return;
       }
@@ -82,7 +155,7 @@ var AudioPlayerWX = /*#__PURE__*/function (_AudioPlayer) {
       _this._offset = 0;
     });
 
-    _this._audio.onEnded(function () {
+    _this._nativeAudio.onEnded(function () {
       if (_this._state === PlayingState.STOPPED) {
         return;
       }
@@ -90,20 +163,22 @@ var AudioPlayerWX = /*#__PURE__*/function (_AudioPlayer) {
       _this._state = PlayingState.STOPPED;
       _this._offset = 0;
 
-      _this._eventTarget.emit('ended');
+      _this._clip.emit('ended');
+
+      AudioPlayerMiniGame._manager.removePlaying(_assertThisInitialized(_this));
     });
 
-    _this._audio.onError(function (res) {
+    _this._nativeAudio.onError(function (res) {
       return console.error(res.errMsg);
     });
 
     return _this;
   }
 
-  _createClass(AudioPlayerWX, [{
+  _createClass(AudioPlayerMiniGame, [{
     key: "play",
     value: function play() {
-      if (!this._audio || this._state === PlayingState.PLAYING) {
+      if (!this._nativeAudio) {
         return;
       }
 
@@ -112,55 +187,58 @@ var AudioPlayerWX = /*#__PURE__*/function (_AudioPlayer) {
         return;
       }
 
-      if (this._oneShoting) {
-        this._audio.volume = this._volume;
-        this._audio.loop = this._loop;
-        this._oneShoting = false;
+      if (this._state === PlayingState.PLAYING) {
+        /* sometimes there is no way to update the playing state
+        especially when player unplug earphones and the audio automatically stops
+        so we need to force updating the playing state by pausing audio */
+        this.pause(); // restart if already playing
+
+        this.setCurrentTime(0);
       }
 
-      this._audio.play();
+      AudioPlayerMiniGame._manager.discardOnePlayingIfNeeded();
+
+      this._nativeAudio.play();
+
+      AudioPlayerMiniGame._manager.addPlaying(this);
     }
   }, {
     key: "pause",
     value: function pause() {
-      if (!this._audio || this._state !== PlayingState.PLAYING) {
+      if (!this._nativeAudio || this._state !== PlayingState.PLAYING) {
         return;
       }
 
-      this._audio.pause();
+      this._nativeAudio.pause();
+
+      AudioPlayerMiniGame._manager.removePlaying(this._clip);
     }
   }, {
     key: "stop",
     value: function stop() {
-      if (!this._audio) {
+      if (!this._nativeAudio) {
         return;
       }
 
-      this._audio.stop();
+      this._nativeAudio.stop();
+
+      AudioPlayerMiniGame._manager.removePlaying(this._clip);
     }
   }, {
     key: "playOneShot",
     value: function playOneShot(volume) {
-      /* InnerAudioContext doesn't support multiple playback at the
-         same time so here we fall back to re-start style approach */
-      if (volume === undefined) {
-        volume = 1;
-      }
+      loadInnerAudioContext(this._nativeAudio.src).then(function (innerAudioContext) {
+        AudioPlayerMiniGame._manager.discardOnePlayingIfNeeded();
 
-      if (!this._audio) {
-        return;
-      }
+        innerAudioContext.volume = volume;
+        innerAudioContext.play();
 
-      this._offset = 0;
-      this._oneShoting = true;
-      this._audio.loop = false;
-      this._audio.volume = volume; // stop and play immediately could run into issues on iOS
+        AudioPlayerMiniGame._manager.addPlaying(innerAudioContext);
 
-      if (this._state === PlayingState.PLAYING) {
-        this._audio.seek(0);
-      } else {
-        this._audio.play();
-      }
+        innerAudioContext.onEnded(function () {
+          AudioPlayerMiniGame._manager.removePlaying(innerAudioContext);
+        });
+      });
     }
   }, {
     key: "getCurrentTime",
@@ -182,14 +260,14 @@ var AudioPlayerWX = /*#__PURE__*/function (_AudioPlayer) {
   }, {
     key: "setCurrentTime",
     value: function setCurrentTime(val) {
-      if (!this._audio) {
+      if (!this._nativeAudio) {
         return;
       }
 
       this._offset = cc.math.clamp(val, 0, this._duration) * 1000;
       this._startTime = performance.now();
 
-      this._audio.seek(val);
+      this._nativeAudio.seek(val);
     }
   }, {
     key: "getVolume",
@@ -201,8 +279,8 @@ var AudioPlayerWX = /*#__PURE__*/function (_AudioPlayer) {
     value: function setVolume(val, immediate) {
       this._volume = val;
 
-      if (this._audio) {
-        this._audio.volume = val;
+      if (this._nativeAudio) {
+        this._nativeAudio.volume = val;
       }
     }
   }, {
@@ -215,22 +293,23 @@ var AudioPlayerWX = /*#__PURE__*/function (_AudioPlayer) {
     value: function setLoop(val) {
       this._loop = val;
 
-      if (this._audio) {
-        this._audio.loop = val;
+      if (this._nativeAudio) {
+        this._nativeAudio.loop = val;
       }
     }
   }, {
     key: "destroy",
     value: function destroy() {
-      if (this._audio) {
-        this._audio.destroy();
+      if (this._nativeAudio) {
+        this._nativeAudio.destroy();
       }
 
-      _get(_getPrototypeOf(AudioPlayerWX.prototype), "destroy", this).call(this);
+      _get(_getPrototypeOf(AudioPlayerMiniGame.prototype), "destroy", this).call(this);
     }
   }]);
 
-  return AudioPlayerWX;
+  return AudioPlayerMiniGame;
 }(AudioPlayer);
 
-exports.AudioPlayerWX = AudioPlayerWX;
+exports.AudioPlayerMiniGame = AudioPlayerMiniGame;
+AudioPlayerMiniGame._manager = new AudioManagerMiniGame();

@@ -94,7 +94,7 @@ var WebSocket = /*#__PURE__*/function () {
   }, {
     key: "send",
     value: function send(data) {
-      if (typeof data !== 'string' && !(data instanceof ArrayBuffer)) {
+      if (typeof data !== 'string' && !(data instanceof ArrayBuffer) && !ArrayBuffer.isView(data)) {
         throw new TypeError("Failed to send message: The data ".concat(data, " is invalid"));
       }
 

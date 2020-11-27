@@ -1,9 +1,0 @@
-{
-    "name": "wechatgame-Plugin",
-    "version": "1.0.0",
-    "author": "Cocos Creator 3D",
-    "description": "Wechat game platform plugin",
-    "contributions": {
-        "builder": "./build.js"
-    }
-}

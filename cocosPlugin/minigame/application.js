@@ -1,240 +1,194 @@
-"use strict";
+System.register([], function (_export, _context) {
+  "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.createApplication = createApplication;
+  function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+  function createApplication(_ref) {
+    var loadJsListFile = _ref.loadJsListFile,
+        ammoJsFallback = _ref.ammoJsFallback,
+        loadAmmoJsWasmBinary = _ref.loadAmmoJsWasmBinary;
+    // NOTE: before here we shall not import any module!
+    var promise = Promise.resolve();
+    return promise.then(function () {
+      return _defineProperty({
+        start: start
+      }, 'import', topLevelImport);
+    });
 
-function createApplication(_ref) {
-  var loadJsListFile = _ref.loadJsListFile,
-      moduleLoader = _ref.moduleLoader,
-      ammoJsFallback = _ref.ammoJsFallback,
-      loadAmmoJsWasmBinary = _ref.loadAmmoJsWasmBinary;
-
-  /**
-   * There are restrictions on some platform that we can not use `System` as System JS global.
-   * The well-known platform is Baidu.
-   * Baidu uses webpack as their pack tool. Webpack by default recognize and transform
-   * `System.import`, `System.register` calls.
-   * However Baidu does not provide a mechanism to config webpack.
-   * So this HACK comes.
-   */
-  var System = globalThis.System;
-
-  if (moduleLoader) {
-    initializeModuleLoader(System, moduleLoader);
-  } // NOTE: before here we shall not import any module!
-
-
-  var promise = Promise.resolve();
-  return promise.then(function () {
-    return _defineProperty({
-      start: start
-    }, 'import', topLevelImport);
-  });
-
-  function start(_ref3) {
-    var findCanvas = _ref3.findCanvas;
-    var settings;
-    var cc;
-    return Promise.resolve().then(function () {
-      return topLevelImport('cc');
-    }).then(function (engine) {
-      cc = engine;
-      return loadSettingsJson(cc);
-    }).then(function () {
-      settings = window._CCSettings;
-      return initializeGame(cc, settings, findCanvas).then(function () {
-        if (settings.scriptPackages) {
-          return loadModulePacks(settings.scriptPackages);
-        }
+    function start(_ref3) {
+      var findCanvas = _ref3.findCanvas;
+      var settings;
+      var cc;
+      return Promise.resolve().then(function () {
+        return topLevelImport('cc');
+      }).then(function (engine) {
+        cc = engine;
+        return loadSettingsJson(cc);
       }).then(function () {
-        return loadJsList(settings.jsList);
-      }).then(function () {
-        return topLevelImport('virtual:///prerequisite-imports:main');
-      }).then(function () {
-        return cc.game.run(function () {
-          return onGameStarted(cc, settings);
+        settings = window._CCSettings;
+        return initializeGame(cc, settings, findCanvas).then(function () {
+          if (settings.scriptPackages) {
+            return loadModulePacks(settings.scriptPackages);
+          }
+        }).then(function () {
+          return loadJsList(settings.jsList);
+        }).then(function () {
+          return loadAssetBundle(settings.hasResourcesBundle, settings.hasStartSceneBundle);
+        }).then(function () {
+          return cc.game.run(function () {
+            return onGameStarted(cc, settings);
+          });
         });
       });
-    });
-  }
+    }
 
-  function topLevelImport(url) {
-    return System["import"](url);
-  }
+    function topLevelImport(url) {
+      return _context["import"]("".concat(url));
+    }
 
-  function loadModulePacks(packs) {
-    return Promise.all(packs.map(function (pack) {
-      return topLevelImport(pack);
-    }));
-  }
+    function loadAssetBundle(hasResourcesBundle, hasStartSceneBundle) {
+      var promise = Promise.resolve();
+      var _cc$AssetManager$Buil = cc.AssetManager.BuiltinBundleName,
+          MAIN = _cc$AssetManager$Buil.MAIN,
+          RESOURCES = _cc$AssetManager$Buil.RESOURCES,
+          START_SCENE = _cc$AssetManager$Buil.START_SCENE;
+      var bundleRoot = hasResourcesBundle ? [RESOURCES, MAIN] : [MAIN];
 
-  function loadJsList(jsList) {
-    var promise = Promise.resolve();
-    jsList.forEach(function (jsListFile) {
-      promise = promise.then(function () {
-        return loadJsListFile("src/".concat(jsListFile));
+      if (hasStartSceneBundle) {
+        bundleRoot.push(START_SCENE);
+      }
+
+      return bundleRoot.reduce(function (pre, name) {
+        return pre.then(function () {
+          return loadBundle(name);
+        });
+      }, Promise.resolve());
+    }
+
+    function loadBundle(name) {
+      return new Promise(function (resolve, reject) {
+        cc.assetManager.loadBundle(name, function (err, bundle) {
+          if (err) {
+            return reject(err);
+          }
+
+          resolve(bundle);
+        });
       });
-    });
-    return promise;
-  }
+    }
 
-  function loadSettingsJson(cc) {
-    return new Promise(function (resolve, reject) {
-      cc.loader.load('./res/settings.724a5.json', function (err, json) {
-        if (err) {
-          return reject(err);
+    function loadModulePacks(packs) {
+      return Promise.all(packs.map(function (pack) {
+        return topLevelImport(pack);
+      }));
+    }
+
+    function loadJsList(jsList) {
+      var promise = Promise.resolve();
+      jsList.forEach(function (jsListFile) {
+        promise = promise.then(function () {
+          return loadJsListFile("src/".concat(jsListFile));
+        });
+      });
+      return promise;
+    }
+
+    function loadSettingsJson(cc) {
+      var server = '';
+      var settings = 'src/settings.json';
+      return new Promise(function (resolve, reject) {
+        if (typeof fsUtils !== 'undefined' && !settings.startsWith('http')) {
+          var result = fsUtils.readJsonSync(settings);
+
+          if (result instanceof Error) {
+            reject(result);
+          } else {
+            window._CCSettings = result;
+            window._CCSettings.server = server;
+            resolve();
+          }
+        } else {
+          var requestSettings = function requestSettings() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', settings);
+            xhr.responseType = 'text';
+
+            xhr.onload = function () {
+              window._CCSettings = JSON.parse(xhr.response);
+              window._CCSettings.server = server;
+              resolve();
+            };
+
+            xhr.onerror = function () {
+              if (retryCount-- > 0) {
+                setTimeout(requestSettings, retryInterval);
+              } else {
+                reject(new Error('request settings failed!'));
+              }
+            };
+
+            xhr.send(null);
+          };
+
+          var retryCount = 3;
+          var retryInterval = 2000;
+          requestSettings();
         }
-
-        window._CCSettings = json;
-        resolve(json);
       });
-    });
-  }
-}
-
-function initializeGame(cc, settings, findCanvas) {
-  if (settings.macros) {
-    for (var key in settings.macros) {
-      cc.macro[key] = settings.macros[key];
     }
   }
 
-  var gameOptions = getGameOptions(settings, findCanvas);
-  var success = cc.game.init(gameOptions);
-  return success ? Promise.resolve() : Promise.reject();
-}
-
-function onGameStarted(cc, settings) {
-  window._CCSettings = undefined;
-  cc.loader.downloader._subpackages = settings.subpackages;
-  cc.view.enableRetina(true);
-  cc.view.resizeWithBrowserSize(true);
-  var launchScene = settings.launchScene; // load scene
-
-  cc.director.loadScene(launchScene, null, function () {
-    cc.view.setDesignResolutionSize(960, 640, 4);
-    cc.loader.onProgress = null;
-    console.log("Success to load scene: ".concat(launchScene));
-  });
-}
-
-function getGameOptions(settings, findCanvas) {
-  var uuids = settings.uuids;
-  var rawAssets = settings.rawAssets;
-  var assetTypes = settings.assetTypes;
-  var realRawAssets = settings.rawAssets = {};
-
-  for (var mount in rawAssets) {
-    var entries = rawAssets[mount];
-    var realEntries = realRawAssets[mount] = {};
-
-    for (var id in entries) {
-      var entry = entries[id];
-      var type = entry[1]; // retrieve minified raw asset
-
-      if (typeof type === 'number') {
-        entry[1] = assetTypes[type];
-      } // retrieve uuid
-
-
-      realEntries[uuids[id] || id] = entry;
-    }
-  }
-
-  var scenes = settings.scenes;
-
-  for (var i = 0; i < scenes.length; ++i) {
-    var scene = scenes[i];
-
-    if (typeof scene.uuid === 'number') {
-      scene.uuid = uuids[scene.uuid];
-    }
-  }
-
-  var packedAssets = settings.packedAssets;
-
-  for (var packId in packedAssets) {
-    var packedIds = packedAssets[packId];
-
-    for (var j = 0; j < packedIds.length; ++j) {
-      if (typeof packedIds[j] === 'number') {
-        packedIds[j] = uuids[packedIds[j]];
+  function initializeGame(cc, settings, findCanvas) {
+    if (settings.macros) {
+      for (var key in settings.macros) {
+        cc.macro[key] = settings.macros[key];
       }
     }
+
+    var gameOptions = getGameOptions(settings, findCanvas);
+    return Promise.resolve(cc.game.init(gameOptions));
   }
 
-  var subpackages = settings.subpackages;
+  function onGameStarted(cc, settings) {
+    window._CCSettings = undefined;
+    cc.view.enableRetina(true);
+    cc.view.resizeWithBrowserSize(true);
+    var launchScene = settings.launchScene; // load scene
 
-  for (var subId in subpackages) {
-    var uuidArray = subpackages[subId].uuids;
-
-    if (uuidArray) {
-      for (var k = 0, l = uuidArray.length; k < l; k++) {
-        if (typeof uuidArray[k] === 'number') {
-          uuidArray[k] = uuids[uuidArray[k]];
-        }
-      }
-    }
-  } // asset library options
-
-
-  var assetOptions = {
-    libraryPath: 'res/import',
-    rawAssetsBase: 'res/raw-',
-    rawAssets: settings.rawAssets,
-    packedAssets: settings.packedAssets,
-    md5AssetsMap: settings.md5AssetsMap,
-    subPackages: settings.subpackages
-  };
-  var options = {
-    scenes: settings.scenes,
-    debugMode: settings.debug ? 1 : 3,
-    // cc.debug.DebugMode.INFO : cc.debug.DebugMode.ERROR,
-    showFPS: !false && settings.debug,
-    frameRate: 60,
-    groupList: settings.groupList,
-    collisionMatrix: settings.collisionMatrix,
-    renderPipeline: settings.renderPipeline,
-    adapter: findCanvas('GameCanvas'),
-    assetOptions: assetOptions,
-    customJointTextureLayouts: settings.customJointTextureLayouts || []
-  };
-  return options;
-}
-
-function initializeModuleLoader(System, _ref4) {
-  var importMap = _ref4.importMap,
-      importMapBaseUrl = _ref4.importMapBaseUrl,
-      execMap = _ref4.execMap,
-      execNoSchema = _ref4.execNoSchema;
-  var noSchemaPlaceholder = 'no-schema:';
-  var systemJsPrototype = System.constructor.prototype;
-  var baseUrlSchema = importMapBaseUrl || noSchemaPlaceholder;
-  System.patches.setBaseUrl("".concat(baseUrlSchema, "/"));
-  System.patches.setImportMap(importMap);
-
-  if (execNoSchema) {
-    System.patches.hookInstantiationOverSchema(noSchemaPlaceholder, function (urlNoSchema, firstParentUrl) {
-      execNoSchema.call(this, urlNoSchema, firstParentUrl);
-      return this.getRegister();
+    cc.director.loadScene(launchScene, null, function () {
+      cc.view.setDesignResolutionSize(960, 640, 4);
+      console.log("Success to load scene: ".concat(launchScene));
     });
   }
 
-  if (execMap) {
-    var _loop = function _loop(schema) {
-      var exec = execMap[schema];
-      System.patches.hookInstantiationOverSchema(schema, function (urlNoSchema, firstParentUrl) {
-        exec.call(this, urlNoSchema, firstParentUrl);
-        return this.getRegister();
-      });
+  function getGameOptions(settings, findCanvas) {
+    // asset library options
+    var assetOptions = {
+      bundleVers: settings.bundleVers,
+      remoteBundles: settings.remoteBundles,
+      server: settings.server,
+      subpackages: settings.subpackages
     };
-
-    for (var schema in execMap) {
-      _loop(schema);
-    }
+    var options = {
+      debugMode: settings.debug ? 1 : 3,
+      // cc.debug.DebugMode.INFO : cc.debug.DebugMode.ERROR,
+      showFPS: !false && settings.debug,
+      frameRate: 60,
+      groupList: settings.groupList,
+      collisionMatrix: settings.collisionMatrix,
+      renderPipeline: settings.renderPipeline,
+      adapter: findCanvas('GameCanvas'),
+      assetOptions: assetOptions,
+      customJointTextureLayouts: settings.customJointTextureLayouts || [],
+      physics: settings.physics
+    };
+    return options;
   }
-}
+
+  _export("createApplication", createApplication);
+
+  return {
+    setters: [],
+    execute: function () {}
+  };
+});

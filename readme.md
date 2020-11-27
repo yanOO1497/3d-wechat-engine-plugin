@@ -35,7 +35,7 @@ https://github.com/cocos-creator/3d-wechat-engine-plugin
   "plugins": {
     "cocos": {
       "version": "dev",
-      "provider": "wx0446ba2621dda60a"
+      "provider": "wx7095f7fa398a2f30"
     }
   }
 ```

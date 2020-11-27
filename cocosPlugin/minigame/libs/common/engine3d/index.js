@@ -10,7 +10,7 @@ require('./Game');
 
 require('./InputManager');
 
-require('./Loader');
+require('./AssetManager');
 
 require('./Screen');
 

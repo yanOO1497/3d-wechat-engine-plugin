@@ -1,1 +1,1 @@
-{"deviceOrientation":"portrait","networkTimeout":{"request":5000,"connectSocket":5000,"uploadFile":5000,"downloadFile":5000},"plugins":{"cocos":{"version":"1.2.2","provider":"wx0446ba2621dda60a","path":"cocos"}},"subpackages":[]}
+{"deviceOrientation":"portrait","networkTimeout":{"request":5000,"connectSocket":5000,"uploadFile":5000,"downloadFile":5000},"plugins":{"cocos":{"version":"2.4.4","provider":"wx7095f7fa398a2f30","path":"cocos"}},"cocos":{"version":"dev","provider":"wx7095f7fa398a2f30"}}

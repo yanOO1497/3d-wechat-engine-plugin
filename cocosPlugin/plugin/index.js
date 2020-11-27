@@ -1,1 +1,1 @@
-console.log('CocosCreator3D')
+console.log('CocosCreator')

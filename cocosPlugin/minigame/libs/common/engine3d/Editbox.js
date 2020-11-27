@@ -9,6 +9,8 @@
   var js = cc.js;
   var KeyboardReturnType = EditBoxComp.KeyboardReturnType;
   var MAX_VALUE = 65535;
+  var KEYBOARD_HIDE_TIME = 600;
+  var _hideKeyboardTimeout = null;
   var _currentEditBoxImpl = null;
 
   function getKeyboardReturnType(type) {
@@ -55,29 +57,24 @@
       this._delegate = delegate;
     },
     beginEditing: function beginEditing() {
+      var _this = this;
+
       // In case multiply register events
-      if (_currentEditBoxImpl === this) {
+      if (this._editing) {
         return;
       }
 
-      var delegate = this._delegate; // handle the old keyboard
+      this._ensureKeyboardHide(function () {
+        var delegate = _this._delegate;
 
-      if (_currentEditBoxImpl) {
-        var currentImplCbs = _currentEditBoxImpl._eventListeners;
-        currentImplCbs.onKeyboardComplete();
-        __globalAdapter.updateKeyboard && __globalAdapter.updateKeyboard({
-          value: delegate.string
-        });
-      } else {
-        this._showKeyboard();
-      }
+        _this._showKeyboard();
 
-      this._registerKeyboardEvent();
+        _this._registerKeyboardEvent();
 
-      this._editing = true;
-      _currentEditBoxImpl = this;
-
-      delegate._editBoxEditingDidBegan();
+        _this._editing = true;
+        _currentEditBoxImpl = _this;
+        delegate.editBoxEditingDidBegan();
+      });
     },
     endEditing: function endEditing() {
       this._hideKeyboard();
@@ -138,6 +135,29 @@
 
         cbs.onKeyboardComplete = null;
       }
+    },
+    _otherEditing: function _otherEditing() {
+      return !!_currentEditBoxImpl && _currentEditBoxImpl !== this && _currentEditBoxImpl._editing;
+    },
+    _ensureKeyboardHide: function _ensureKeyboardHide(cb) {
+      var otherEditing = this._otherEditing();
+
+      if (!otherEditing && !_hideKeyboardTimeout) {
+        return cb();
+      }
+
+      if (_hideKeyboardTimeout) {
+        clearTimeout(_hideKeyboardTimeout);
+      }
+
+      if (otherEditing) {
+        _currentEditBoxImpl.endEditing();
+      }
+
+      _hideKeyboardTimeout = setTimeout(function () {
+        _hideKeyboardTimeout = null;
+        cb();
+      }, KEYBOARD_HIDE_TIME);
     },
     _showKeyboard: function _showKeyboard() {
       var delegate = this._delegate;

@@ -67,6 +67,7 @@ var XMLHttpRequest = /*#__PURE__*/function (_EventTarget) {
     _classCallCheck(this, XMLHttpRequest);
 
     _this2 = _possibleConstructorReturn(this, _getPrototypeOf(XMLHttpRequest).call(this));
+    _this2.timeout = 0;
     _this2.onabort = null;
     _this2.onerror = null;
     _this2.onload = null;
@@ -148,6 +149,7 @@ var XMLHttpRequest = /*#__PURE__*/function (_EventTarget) {
           header: _requestHeader.get(this),
           dataType: 'other',
           responseType: this.responseType === 'arraybuffer' ? 'arraybuffer' : 'text',
+          timeout: this.timeout || undefined,
           success: function success(_ref) {
             var data = _ref.data,
                 statusCode = _ref.statusCode,
