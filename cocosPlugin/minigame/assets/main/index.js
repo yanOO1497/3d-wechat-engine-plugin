@@ -1,4 +1,4 @@
-System.register("chunks:///_virtual/main",[],(function(e,t){return{setters:[],execute:function(){}}}));
+System.register("chunks:///_virtual/main",[],(function(){"use strict";return{execute:function(){}}}));
 
 (function(r) {
   r('virtual:///prerequisite-imports/main', 'chunks:///_virtual/main'); 

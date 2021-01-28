@@ -33,11 +33,11 @@ var _window$fsUtils = window.fsUtils,
     downloadFile = _window$fsUtils.downloadFile,
     deleteFile = _window$fsUtils.deleteFile,
     rmdirSync = _window$fsUtils.rmdirSync,
-    unzip = _window$fsUtils.unzip;
+    unzip = _window$fsUtils.unzip,
+    isOutOfStorage = _window$fsUtils.isOutOfStorage;
 var checkNextPeriod = false;
 var writeCacheFileList = null;
 var cleaning = false;
-var errTest = /the maximum size of the file storage/;
 var suffix = 0;
 var REGEX = /^https?:\/\/.*/;
 var cacheManager = {
@@ -126,7 +126,7 @@ var cacheManager = {
 
     function callback(err) {
       if (err) {
-        if (errTest.test(err.message)) {
+        if (isOutOfStorage(err.message)) {
           self.outOfStorage = true;
           self.autoClear && self.clearLRU();
           return;
@@ -263,7 +263,7 @@ var cacheManager = {
       if (err) {
         rmdirSync(targetPath, true);
 
-        if (errTest.test(err.message)) {
+        if (isOutOfStorage(err.message)) {
           self.outOfStorage = true;
           self.autoClear && self.clearLRU();
         }

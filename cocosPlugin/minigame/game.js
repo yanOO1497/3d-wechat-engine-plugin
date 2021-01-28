@@ -1,8 +1,7 @@
 require('./libs/wrapper/builtin/index');
 window.DOMParser = require('./libs/common/xmldom/dom-parser').DOMParser;
-require('./libs/common/engine3d/globalAdapter/index');
+require('./libs/common/engine/globalAdapter/index');
 require('./libs/wrapper/unify');
-require('./libs/wrapper/systemInfo');
 require('./libs/wrapper/fs-utils');
 
 
@@ -48,28 +47,40 @@ System.warmup({
     },
 });
 
-window.__globalAdapter.init(function() {
-    System.import('./application.js').then(({ createApplication }) => {
-        return createApplication({
-            loadJsListFile: (url) => require(url),
-             
-        });
-    }).then((application) => {
-        return onApplicationCreated(application);
-    }).catch((err) => {
-        console.error(err);
+/**
+ * Fetch WebAssembly binaries.
+ * 
+ * Whereas WeChat expects the argument passed to `WebAssembly.instantiate`
+ * to be file path and the path should be relative from project's root dir,
+ * we do the path conversion and directly return the converted path.
+ * 
+ * @param path The path to `.wasm` file **relative from engine's out dir**(no leading `./`).
+ * See 'assetURLFormat' field of build engine options.
+ */
+function fetchWasm(path) {
+    const engineDir = 'cocos-js'; // Relative from project out
+    return `${engineDir}/${path}`;
+}
+
+System.import('./application.js').then(({ createApplication }) => {
+    return createApplication({
+        loadJsListFile: (url) => require(url),
+        fetchWasm,
     });
+}).then((application) => {
+    return onApplicationCreated(application);
+}).catch((err) => {
+    console.error(err);
 });
 
 function onApplicationCreated(application) {
     return application.import('cc').then((cc) => {
-        require('./libs/common/engine3d/index.js');
+        require('./libs/common/engine/index.js');
+        require('./libs/wrapper/engine/index');
+        cc.sys.__init();
         require('./libs/common/cache-manager.js');
         // Adjust devicePixelRatio
         cc.view._maxPixelRatio = 4;
-        // downloader polyfill
-
-        require('./libs/wrapper/engine/index');
         // Release Image objects after uploaded gl texture
         cc.macro.CLEANUP_IMAGE_CACHE = false;
         return application.start({

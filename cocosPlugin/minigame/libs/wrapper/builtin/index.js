@@ -72,4 +72,7 @@ function inject() {
 if (!GameGlobal.__isAdapterInjected) {
   GameGlobal.__isAdapterInjected = true;
   inject();
-}
+} // overwrite global WebAssembly
+
+
+global.WebAssembly = global.WXWebAssembly;

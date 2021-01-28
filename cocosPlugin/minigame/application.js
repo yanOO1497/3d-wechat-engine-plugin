@@ -5,8 +5,7 @@ System.register([], function (_export, _context) {
 
   function createApplication(_ref) {
     var loadJsListFile = _ref.loadJsListFile,
-        ammoJsFallback = _ref.ammoJsFallback,
-        loadAmmoJsWasmBinary = _ref.loadAmmoJsWasmBinary;
+        fetchWasm = _ref.fetchWasm;
     // NOTE: before here we shall not import any module!
     var promise = Promise.resolve();
     return promise.then(function () {
