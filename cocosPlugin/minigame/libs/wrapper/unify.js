@@ -105,5 +105,35 @@ if (window.__globalAdapter) {
 
       });
     }
-  });
+  }); // safeArea
+  // origin point on the top-left corner
+
+  globalAdapter.getSafeArea = function () {
+    var _systemInfo$safeArea = systemInfo.safeArea,
+        top = _systemInfo$safeArea.top,
+        left = _systemInfo$safeArea.left,
+        bottom = _systemInfo$safeArea.bottom,
+        right = _systemInfo$safeArea.right,
+        width = _systemInfo$safeArea.width,
+        height = _systemInfo$safeArea.height; // HACK: on iOS device, the orientation should mannually rotate
+
+    if (systemInfo.platform === 'ios' && !globalAdapter.isDevTool && isLandscape) {
+      var tempData = [right, top, left, bottom, width, height];
+      top = windowHeight - tempData[0];
+      left = tempData[1];
+      bottom = windowHeight - tempData[2];
+      right = tempData[3];
+      height = tempData[4];
+      width = tempData[5];
+    }
+
+    return {
+      top: top,
+      left: left,
+      bottom: bottom,
+      right: right,
+      width: width,
+      height: height
+    };
+  };
 }

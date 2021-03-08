@@ -6,14 +6,14 @@
  https://www.cocos.com/
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
+ of fsUtils software and associated engine source code (the "Software"), a limited,
   worldwide, royalty-free, non-assignable, revocable and non-exclusive license
  to use Cocos Creator solely to develop games on your target platforms. You shall
   not use Cocos Creator software for developing other software or tools that's
   used for developing games. You are not granted to publish, distribute,
   sublicense, and/or sell copies of Cocos Creator.
 
- The software or tools in this License Agreement are licensed, not sold.
+ The software or tools in fsUtils License Agreement are licensed, not sold.
  Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -25,222 +25,219 @@
  THE SOFTWARE.
  ****************************************************************************/
 var fs = wx.getFileSystemManager ? wx.getFileSystemManager() : null;
-
-function getUserDataPath() {
-  return wx.env.USER_DATA_PATH;
-}
-
-function checkFsValid() {
-  if (!fs) {
-    console.warn('can not get the file system!');
-    return new Error('file system does not exist!');
-  }
-
-  return null;
-}
-
-function deleteFile(filePath, callback) {
-  var result = checkFsValid();
-  if (result) return result;
-  fs.unlink({
-    filePath: filePath,
-    success: function success() {
-      cc.log('Removed local file ' + filePath + ' successfully!');
-      callback && callback(null);
-    },
-    fail: function fail(res) {
-      console.warn(res.errMsg);
-      callback && callback(new Error(res.errMsg));
-    }
-  });
-}
-
-function downloadFile(remoteUrl, filePath, callback) {
-  wx.downloadFile({
-    url: remoteUrl,
-    filePath: filePath,
-    success: function success(res) {
-      if (res.statusCode === 200) {
-        callback && callback(null, res.tempFilePath || res.filePath);
-      } else {
-        if (res.filePath) {
-          deleteFile(res.filePath);
-        }
-
-        console.warn("Download file failed: " + remoteUrl);
-        callback && callback(new Error(res.errMsg), null);
-      }
-    },
-    fail: function fail(res) {
-      console.warn(res.errMsg);
-      callback && callback(new Error(res.errMsg), null);
-    }
-  });
-}
-
-function saveFile(srcPath, destPath, callback) {
-  wx.saveFile({
-    tempFilePath: srcPath,
-    filePath: destPath,
-    success: function success(res) {
-      cc.log('save file finished:' + destPath);
-      callback && callback(null, res.savedFilePath);
-    },
-    fail: function fail(res) {
-      cc.log('save file failed:' + res.errMsg);
-      callback && callback(new Error(res.errMsg), null);
-    }
-  });
-}
-
-function copyFile(srcPath, destPath, callback) {
-  var result = checkFsValid();
-  if (result) return result;
-  fs.copyFile({
-    srcPath: srcPath,
-    destPath: destPath,
-    success: function success() {
-      cc.log('copy file finished:' + destPath);
-      callback && callback(null);
-    },
-    fail: function fail(res) {
-      cc.log('copy file failed:' + res.errMsg);
-      callback && callback(new Error(res.errMsg));
-    }
-  });
-}
-
-function writeFile(path, data, encoding, callback) {
-  var result = checkFsValid();
-  if (result) return result;
-  fs.writeFile({
-    filePath: path,
-    encoding: encoding,
-    data: data,
-    success: callback ? function () {
-      callback(null);
-    } : undefined,
-    fail: function fail(res) {
-      console.warn(res.errMsg);
-      callback && callback(new Error(res.errMsg));
-    }
-  });
-}
-
-function writeFileSync(path, data, encoding) {
-  var result = checkFsValid();
-  if (result) return result;
-
-  try {
-    fs.writeFileSync(path, data, encoding);
-    return null;
-  } catch (e) {
-    console.warn(e.message);
-    return new Error(e.message);
-  }
-}
-
-function readFile(filePath, encoding, callback) {
-  var result = checkFsValid();
-  if (result) return result;
-
-  if (filePath.indexOf('./') === 0) {
-    filePath = filePath.replace('./', '');
-  }
-
-  fs.readFile({
-    filePath: filePath,
-    encoding: encoding,
-    success: callback ? function (res) {
-      callback(null, res.data);
-    } : undefined,
-    fail: function fail(res) {
-      console.warn(res.errMsg);
-      callback && callback(new Error(res.errMsg), null);
-    }
-  });
-}
-
-function readDir(filePath, callback) {
-  var result = checkFsValid();
-
-  if (result) {
-    return result;
-  }
-
-  fs.readdir({
-    dirPath: filePath,
-    success: callback ? function (res) {
-      callback(null, res.files);
-    } : undefined,
-    fail: callback ? function (res) {
-      callback(new Error(res.errMsg), null);
-    } : undefined
-  });
-}
-
-function readText(filePath, callback) {
-  return readFile(filePath, 'utf8', callback);
-}
-
-function readArrayBuffer(filePath, callback) {
-  return readFile(filePath, '', callback);
-}
-
-function readJsonSync(path) {
-  var result = checkFsValid();
-  if (result) return result;
-
-  try {
-    var str = fs.readFileSync(path, 'utf8');
-    return JSON.parse(str);
-  } catch (e) {
-    console.warn(e.message);
-    return new Error(e.message);
-  }
-}
-
-function makeDirSync(path, recursive) {
-  var result = checkFsValid();
-  if (result) return result;
-
-  try {
-    fs.mkdirSync(path, recursive);
-    return null;
-  } catch (e) {
-    console.warn(e.message);
-    return new Error(e.message);
-  }
-}
-
-function exists(filePath, callback) {
-  var result = checkFsValid();
-  if (result) return result;
-  fs.access({
-    path: filePath,
-    success: callback ? function () {
-      callback(true);
-    } : undefined,
-    fail: callback ? function () {
-      callback(false);
-    } : undefined
-  });
-}
-
-window.fsUtils = module.exports = {
+var outOfStorageRegExp = /the maximum size of the file storage/;
+var fsUtils = {
   fs: fs,
-  getUserDataPath: getUserDataPath,
-  checkFsValid: checkFsValid,
-  readDir: readDir,
-  exists: exists,
-  copyFile: copyFile,
-  downloadFile: downloadFile,
-  readText: readText,
-  readArrayBuffer: readArrayBuffer,
-  saveFile: saveFile,
-  writeFile: writeFile,
-  deleteFile: deleteFile,
-  writeFileSync: writeFileSync,
-  readJsonSync: readJsonSync,
-  makeDirSync: makeDirSync
+  isOutOfStorage: function isOutOfStorage(errMsg) {
+    return outOfStorageRegExp.test(errMsg);
+  },
+  getUserDataPath: function getUserDataPath() {
+    return wx.env.USER_DATA_PATH;
+  },
+  checkFsValid: function checkFsValid() {
+    if (!fs) {
+      console.warn('can not get the file system!');
+      return false;
+    }
+
+    return true;
+  },
+  deleteFile: function deleteFile(filePath, onComplete) {
+    fs.unlink({
+      filePath: filePath,
+      success: function success() {
+        onComplete && onComplete(null);
+      },
+      fail: function fail(res) {
+        console.warn("Delete file failed: path: ".concat(filePath, " message: ").concat(res.errMsg));
+        onComplete && onComplete(new Error(res.errMsg));
+      }
+    });
+  },
+  downloadFile: function downloadFile(remoteUrl, filePath, header, onProgress, onComplete) {
+    var options = {
+      url: remoteUrl,
+      success: function success(res) {
+        if (res.statusCode === 200) {
+          onComplete && onComplete(null, res.tempFilePath || res.filePath);
+        } else {
+          if (res.filePath) {
+            fsUtils.deleteFile(res.filePath);
+          }
+
+          console.warn("Download file failed: path: ".concat(remoteUrl, " message: ").concat(res.statusCode));
+          onComplete && onComplete(new Error(res.statusCode), null);
+        }
+      },
+      fail: function fail(res) {
+        console.warn("Download file failed: path: ".concat(remoteUrl, " message: ").concat(res.errMsg));
+        onComplete && onComplete(new Error(res.errMsg), null);
+      }
+    };
+    if (filePath) options.filePath = filePath;
+    if (header) options.header = header;
+    var task = wx.downloadFile(options);
+    onProgress && task.onProgressUpdate(onProgress);
+  },
+  saveFile: function saveFile(srcPath, destPath, onComplete) {
+    wx.saveFile({
+      tempFilePath: srcPath,
+      filePath: destPath,
+      success: function success(res) {
+        onComplete && onComplete(null);
+      },
+      fail: function fail(res) {
+        console.warn("Save file failed: path: ".concat(srcPath, " message: ").concat(res.errMsg));
+        onComplete && onComplete(new Error(res.errMsg));
+      }
+    });
+  },
+  copyFile: function copyFile(srcPath, destPath, onComplete) {
+    fs.copyFile({
+      srcPath: srcPath,
+      destPath: destPath,
+      success: function success() {
+        onComplete && onComplete(null);
+      },
+      fail: function fail(res) {
+        console.warn("Copy file failed: path: ".concat(srcPath, " message: ").concat(res.errMsg));
+        onComplete && onComplete(new Error(res.errMsg));
+      }
+    });
+  },
+  writeFile: function writeFile(path, data, encoding, onComplete) {
+    fs.writeFile({
+      filePath: path,
+      encoding: encoding,
+      data: data,
+      success: function success() {
+        onComplete && onComplete(null);
+      },
+      fail: function fail(res) {
+        console.warn("Write file failed: path: ".concat(path, " message: ").concat(res.errMsg));
+        onComplete && onComplete(new Error(res.errMsg));
+      }
+    });
+  },
+  writeFileSync: function writeFileSync(path, data, encoding) {
+    try {
+      fs.writeFileSync(path, data, encoding);
+      return null;
+    } catch (e) {
+      console.warn("Write file failed: path: ".concat(path, " message: ").concat(e.message));
+      return new Error(e.message);
+    }
+  },
+  readFile: function readFile(filePath, encoding, onComplete) {
+    fs.readFile({
+      filePath: filePath,
+      encoding: encoding,
+      success: function success(res) {
+        onComplete && onComplete(null, res.data);
+      },
+      fail: function fail(res) {
+        console.warn("Read file failed: path: ".concat(filePath, " message: ").concat(res.errMsg));
+        onComplete && onComplete(new Error(res.errMsg), null);
+      }
+    });
+  },
+  readDir: function readDir(filePath, onComplete) {
+    fs.readdir({
+      dirPath: filePath,
+      success: function success(res) {
+        onComplete && onComplete(null, res.files);
+      },
+      fail: function fail(res) {
+        console.warn("Read directory failed: path: ".concat(filePath, " message: ").concat(res.errMsg));
+        onComplete && onComplete(new Error(res.errMsg), null);
+      }
+    });
+  },
+  readText: function readText(filePath, onComplete) {
+    fsUtils.readFile(filePath, 'utf8', onComplete);
+  },
+  readArrayBuffer: function readArrayBuffer(filePath, onComplete) {
+    fsUtils.readFile(filePath, '', onComplete);
+  },
+  readJson: function readJson(filePath, onComplete) {
+    fsUtils.readFile(filePath, 'utf8', function (err, text) {
+      var out = null;
+
+      if (!err) {
+        try {
+          out = JSON.parse(text);
+        } catch (e) {
+          console.warn("Read json failed: path: ".concat(filePath, " message: ").concat(e.message));
+          err = new Error(e.message);
+        }
+      }
+
+      onComplete && onComplete(err, out);
+    });
+  },
+  readJsonSync: function readJsonSync(path) {
+    try {
+      var str = fs.readFileSync(path, 'utf8');
+      return JSON.parse(str);
+    } catch (e) {
+      console.warn("Read json failed: path: ".concat(path, " message: ").concat(e.message));
+      return new Error(e.message);
+    }
+  },
+  makeDirSync: function makeDirSync(path, recursive) {
+    try {
+      fs.mkdirSync(path, recursive);
+      return null;
+    } catch (e) {
+      console.warn("Make directory failed: path: ".concat(path, " message: ").concat(e.message));
+      return new Error(e.message);
+    }
+  },
+  rmdirSync: function rmdirSync(dirPath, recursive) {
+    try {
+      fs.rmdirSync(dirPath, recursive);
+    } catch (e) {
+      console.warn("rm directory failed: path: ".concat(dirPath, " message: ").concat(e.message));
+      return new Error(e.message);
+    }
+  },
+  exists: function exists(filePath, onComplete) {
+    fs.access({
+      path: filePath,
+      success: function success() {
+        onComplete && onComplete(true);
+      },
+      fail: function fail() {
+        onComplete && onComplete(false);
+      }
+    });
+  },
+  loadSubpackage: function loadSubpackage(name, onProgress, onComplete) {
+    var task = wx.loadSubpackage({
+      name: name,
+      success: function success() {
+        onComplete && onComplete();
+      },
+      fail: function fail(res) {
+        console.warn("Load Subpackage failed: path: ".concat(name, " message: ").concat(res.errMsg));
+        onComplete && onComplete(new Error("Failed to load subpackage ".concat(name, ": ").concat(res.errMsg)));
+      }
+    });
+    onProgress && task.onProgressUpdate(onProgress);
+    return task;
+  },
+  unzip: function unzip(zipFilePath, targetPath, onComplete) {
+    fs.unzip({
+      zipFilePath: zipFilePath,
+      targetPath: targetPath,
+      success: function success() {
+        onComplete && onComplete(null);
+      },
+      fail: function fail(res) {
+        console.warn("unzip failed: path: ".concat(zipFilePath, " message: ").concat(res.errMsg));
+        onComplete && onComplete(new Error('unzip failed: ' + res.errMsg));
+      }
+    });
+  }
 };
+window.fsUtils = module.exports = fsUtils;

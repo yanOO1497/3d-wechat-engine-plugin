@@ -1,8 +1,8 @@
 require('./libs/wrapper/builtin/index');
 window.DOMParser = require('./libs/common/xmldom/dom-parser').DOMParser;
-require('./libs/common/engine3d/globalAdapter/index');
+require('./libs/common/engine/globalAdapter/index');
 require('./libs/wrapper/unify');
-require('./libs/wrapper/systemInfo');
+require('./libs/wrapper/fs-utils');
 
 
 // Polyfills bundle.
@@ -11,8 +11,6 @@ require("src/polyfills.bundle.js");
 // SystemJS support.
 require("src/system.bundle.js");
 
-
-const { createApplication } = require('./application.js');
 
 // Adapt for IOS, swap if opposite
 if (canvas){
@@ -35,40 +33,56 @@ if (canvas){
 // Adjust initial canvas size
 if (canvas && window.devicePixelRatio >= 2) {canvas.width *= 2; canvas.height *= 2;}
 
-window.__globalAdapter.init(function() {
-    createApplication({
-        moduleLoader: {
-            importMap: require("src/import-map.js").default,
-            execNoSchema: (urlNoSchema) => require(`.${urlNoSchema}`),
-            execMap: {
-                'plugin:': (urlNoSchema) => requirePlugin(urlNoSchema),
-            },
+const importMap = require("src/import-map.js").default;
+System.warmup({
+    importMap,
+    importMapUrl: 'src/import-map.js',
+    defaultHandler: (urlNoSchema) => {
+        require('.' + urlNoSchema);
+    },
+    handlers: {
+        'plugin:': (urlNoSchema) => {
+            requirePlugin(urlNoSchema);
         },
+    },
+});
+
+/**
+ * Fetch WebAssembly binaries.
+ * 
+ * Whereas WeChat expects the argument passed to `WebAssembly.instantiate`
+ * to be file path and the path should be relative from project's root dir,
+ * we do the path conversion and directly return the converted path.
+ * 
+ * @param path The path to `.wasm` file **relative from engine's out dir**(no leading `./`).
+ * See 'assetURLFormat' field of build engine options.
+ */
+function fetchWasm(path) {
+    const engineDir = 'cocos-js'; // Relative from project out
+    return `${engineDir}/${path}`;
+}
+
+System.import('./application.js').then(({ createApplication }) => {
+    return createApplication({
         loadJsListFile: (url) => require(url),
-    }).then((application) => {
-        return onApplicationCreated(application);
-    }).catch((err) => {
-        console.error(err);
+        fetchWasm,
     });
+}).then((application) => {
+    return onApplicationCreated(application);
+}).catch((err) => {
+    console.error(err);
 });
 
 function onApplicationCreated(application) {
     return application.import('cc').then((cc) => {
-        require('./libs/common/engine3d/index.js');
-        require('./libs/common/remote-downloader.js');
+        require('./libs/common/engine/index.js');
+        require('./libs/wrapper/engine/index');
+        cc.sys.__init();
+        require('./libs/common/cache-manager.js');
         // Adjust devicePixelRatio
         cc.view._maxPixelRatio = 4;
-        // downloader polyfill
-        remoteDownloader.REMOTE_SERVER_ROOT = '';
-        remoteDownloader.SUBCONTEXT_ROOT = '';
-        var pipeBeforeDownloader = cc.loader.md5Pipe || cc.loader.subPackPipe || cc.loader.assetLoader;
-        cc.loader.insertPipeAfter(pipeBeforeDownloader, remoteDownloader);
-        window.wxDownloader = remoteDownloader;
-
-        require('./libs/wrapper/engine/index');
         // Release Image objects after uploaded gl texture
-        cc.macro.CLEANUP_IMAGE_CACHE = true;
-        remoteDownloader.init();
+        cc.macro.CLEANUP_IMAGE_CACHE = false;
         return application.start({
             findCanvas: () => {
                 var container = document.createElement('div');

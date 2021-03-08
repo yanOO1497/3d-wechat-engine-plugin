@@ -1455,8 +1455,8 @@ try {
       object['$$' + key] = value;
     };
   }
-} catch (e) {} //ie8
-//if(typeof require == 'function'){
+} catch (e) {//ie8
+} //if(typeof require == 'function'){
 
 
 exports.DOMImplementation = DOMImplementation;

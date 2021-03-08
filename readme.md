@@ -6,7 +6,7 @@
 
 ![](./images/download.png)
 
-https://github.com/cocos-creator/3d-wechat-engine-plugin
+<https://github.com/cocos-creator/3d-wechat-engine-plugin>
 
 直接使用 git 拉取项目或者下载 zip 包即可。
 
@@ -14,7 +14,7 @@ https://github.com/cocos-creator/3d-wechat-engine-plugin
 
 ### 手动拷贝方式
 
-清空`cocosPlugin/plugin` 目录，将 `3d/engine/bin/.cache/editor-cache/wechat-game/cocos` 路径下的所有文件，直接复制到 `cocosPlugin/plugin` 目录下。(仅需拷贝一次)
+清空`cocosPlugin/plugin` 目录，将 `3d/engine/bin/.cache/editor-cache/wechat-game/plugin` 路径下的所有文件，直接复制到 `cocosPlugin/plugin` 目录下。(仅需拷贝一次)
 
 ### 自动拷贝方式
 
@@ -35,7 +35,7 @@ https://github.com/cocos-creator/3d-wechat-engine-plugin
   "plugins": {
     "cocos": {
       "version": "dev",
-      "provider": "wx0446ba2621dda60a"
+      "provider": "wx7095f7fa398a2f30"
     }
   }
 ```
