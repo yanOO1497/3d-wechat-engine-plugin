@@ -36,9 +36,9 @@ function onAfterBuild(options, result) {
     projectConfigJson.appid = appid;
     writeJSONSync(projectConfigJsonPath, projectConfigJson);
 
-    const pluginDest = join(__dirname, '../../cocosPlugin/plugin');
-    emptyDirSync(pluginDest);
     if (!copyTime) {
+        const pluginDest = join(__dirname, '../../cocosPlugin/plugin');
+        emptyDirSync(pluginDest);
         const dir = join(Editor.App.path, '../resources/3d/engine/bin/.cache/editor-cache/wechat-game/plugin');
         // 将编辑器内置的引擎拷贝到 plugin 内部
         copySync(dir, pluginDest);

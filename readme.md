@@ -1,6 +1,7 @@
-# 微信引擎插件发布流程
+# 微信引擎插件发布测试流程
 
 自 1.2 起，实际需要上传的引擎插件放置在编辑器打包路径的 resources 文件夹下的 3d/engine/bin/.cache/editor-cache/wechat-game/cocos 目录下。
+自 3.0 起，实际需要上传的引擎插件放置在编辑器打包路径的 resources 文件夹下的 3d/engine/bin/.cache/editor-cache/wechat-game/plugin 目录下。
 
 ## 下载项目包
 
@@ -10,7 +11,9 @@
 
 直接使用 git 拉取项目或者下载 zip 包即可。
 
-## 插件包生成步骤
+## 插件包生成
+
+有两种方式，选其一即可
 
 ### 手动拷贝方式
 
@@ -31,16 +34,18 @@
 2. 在编辑器内打开当前项目，只勾选引擎分离选项，构建微信包。
 3. 将构建成功的微信包除了 `cocos` 文件夹，复制到 `cocosPlugin/minigame` 文件夹内，并将项目内的 `game.json` 里的 `plugins` 字段改成下图所示。
 
-```
+```json
   "plugins": {
     "cocos": {
       "version": "dev",
-      "provider": "wx7095f7fa398a2f30"
+      "provider": "wx0446ba2621dda60a"
     }
   }
 ```
 
-4. 一共需要构建 3 次，分别是不同物理引擎模块的选项；
+4. 根据不同的引擎模块选择需求来构建测试即可。
+
+5. 点击上传，在弹出的弹框内查看版本号，观察编辑器直接构建出来的微信包内，game.json 内 plugin.cocos.version 版本号知否大于线上版本号。
 
 ## 上传发布阶段
 
